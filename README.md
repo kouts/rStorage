@@ -1,0 +1,4 @@
+rStorage
+========
+
+jQuery rStorage Plugin
