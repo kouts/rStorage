@@ -35,12 +35,13 @@ The API is the same for both storages.
 ##### Getter
 
     $.localStorage('testNamespace');      //getter
+    $.localStorage('testNamespace.level1');      //dot notation getter
 
 ##### Removing parts by dot notation
 
     $.localStorage.remove('testNamespace.level1.level2');
 
-##### Sae exapmles for sessionStorage
+##### Same examples for sessionStorage
 
     $.sessionStorage('testNamespace');     //getter, it does not see what we have in $.localStorage
     $.sessionStorage('testNamespace', {
