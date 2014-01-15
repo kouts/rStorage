@@ -13,11 +13,14 @@ Functionalities:
 * Simple namespacing
 * Store objects and encoding, decoding to or from JSON happens automatically
 * Same function call for getters and setters
+* Setters and getters reognize dot notation format
 * Integrated unit tests
 
 #### How to use
 
 The API is the same for both storages.
+
+##### Setter
 
     var myObject = {
       level1 : {
@@ -26,9 +29,18 @@ The API is the same for both storages.
          }
       }
     }
+    
     $.localStorage('testNamespace', myObject);     //setter
+
+##### Getter
+
     $.localStorage('testNamespace');      //getter
+
+##### Removing parts by dot notation
+
     $.localStorage.remove('testNamespace.level1.level2');
+
+##### Sae exapmles for sessionStorage
 
     $.sessionStorage('testNamespace');     //getter, it does not see what we have in $.localStorage
     $.sessionStorage('testNamespace', {
