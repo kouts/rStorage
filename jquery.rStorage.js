@@ -7,7 +7,7 @@
 * Copyright (c) 2014 rrd
 *
 * Licensed under the MIT license:
-* http://www.opensource.org/licenses/mit-license.php
+* http://opensource.org/licenses/MIT
 *
 * Project home:
 * https://github.com/rrd108/rStorage
