@@ -20,8 +20,8 @@
 	function RStorage(target){
 		return {
 			get : function(key){
-				//get part of the object identified by key (myNamespace.firstLevel.secondLevel)
-				//TODO use only local no native
+				//returns part of the object identified by key (myNamespace.firstLevel.secondLevel) or return null if the key does not exists
+				//TODO use only local not native
 				key = key.split('.');
 				var namespace = key.shift();	//get the first part like nsp from myNamespace.firstLevel.secondLevel				
 				try{
@@ -41,8 +41,14 @@
 			},
 
 			_reset : function(key, json){
-				target.setItem(key, JSON.stringify(json));
-				return json;
+				if (key.search(/\./) == -1) {
+					target.setItem(key, JSON.stringify(json));
+					return json;
+				}
+				else{
+					//the key is in dot notation form, reject it
+					throw new Error(key + ' is an invalid key');
+				}
 			},
 
 			remove : function(key){

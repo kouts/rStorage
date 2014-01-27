@@ -71,7 +71,7 @@ test('$.sessionStorage Test', function(){
 	$.sessionStorage.remove('sample.widget.image');
 	deepEqual($.sessionStorage.remove('sample.widget.text'),
 				 {widget : {debug : 'on'}},
-				 'remove: removed a sub-object and return the new object');
+				 'remove: removed a sub-object and return the new object');    
 });
 
 test('$.localStorage Test', function(){
