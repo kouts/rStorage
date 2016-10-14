@@ -130,7 +130,7 @@ JSON.flatten = function(data) {
 
 	var rSessStorage = new RStorage(sessionStorage);
 	$.sessionStorage = function(namespace, path){
-		if (!path) {
+		if (typeof(path) === 'undefined') {
 			return rSessStorage.get(namespace);
 		}
 		else{
@@ -143,7 +143,7 @@ JSON.flatten = function(data) {
 	
 	var rLocStorage = new RStorage(localStorage);
 	$.localStorage = function(namespace, path){
-		if (!path) {
+        if (typeof(path) === 'undefined') {
 			return rLocStorage.get(namespace);
 		}
 		else{
