@@ -45,16 +45,17 @@ The API is the same for both storages.
 ### Same examples for sessionStorage
 
     $.sessionStorage('testNamespace');     //getter, it does not see what we have in $.localStorage
-    $.sessionStorage('testNamespace', {
-                                       book : {
-                                          chapter1: {
-                                             title : 'First Chapter',
-                                             pages : 200
-                                          }
-                                          chapter2: {
-                                             title : 'Second Chapter',
-                                             pages : 300
-                                          }
-                                       }
-                                       });
+    $.sessionStorage('testNamespace',
+        {
+           book : {
+              chapter1: {
+                 title : 'First Chapter',
+                 pages : 200
+              }
+              chapter2: {
+                 title : 'Second Chapter',
+                 pages : 300
+              }
+           }
+        });
     $.sessionStorage('testNamespace');    //getter will return our book object
