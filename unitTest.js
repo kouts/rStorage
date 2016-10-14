@@ -28,29 +28,44 @@ QUnit.test('$.sessionStorage Test', function(assert){
 				 null,
 				 'getter: non existent key returned null');
 	
-	assert.deepEqual($.sessionStorage('testNamespace', {van : true}),
-				 {van : true},
+	assert.deepEqual($.sessionStorage('testNamespace', {test : true}),
+				 {test : true},
 				 'setter: returned the correct object');
 	
-	assert.deepEqual($.sessionStorage('testNamespace', {nincs: 5}),
-				 {van : true, nincs : 5},
+	assert.deepEqual($.sessionStorage('testNamespace', {otherKey: 5}),
+				 {test : true, otherKey : 5},
 				 'setter: added new property and returned the new full object');
-	
-	assert.deepEqual($.sessionStorage('testNamespace', {van : false, nincs: 5}),
-				 {van : false, nincs : 5},
+
+	assert.deepEqual($.sessionStorage('testNamespace', {test : false, otherKey: 5}),
+				 {test : false, otherKey : 5},
 				 'setter: overwrote a property and returned the new full object when given unchanged property');
 	
-	assert.deepEqual($.sessionStorage('testNamespace', {van : 13}),
-				 {van : 13, nincs : 5},
+	assert.deepEqual($.sessionStorage('testNamespace', {test : 13}),
+				 {test : 13, otherKey : 5},
 				 'setter: overwrote a property and returned the new full object when given only what changed');
 
-	assert.deepEqual($.sessionStorage.remove('testNamespace.nincs'),
-				 {van : 13},
+    assert.deepEqual($.sessionStorage('testNamespace.otherKey', 10),
+        {test : 13, otherKey : 10},
+        'setter: overwrote a property by dot notation with a simple value');
+
+    assert.deepEqual($.sessionStorage('testNamespace.otherKey', {obj : true}),
+        {test : 13, otherKey : {obj : true}},
+        'setter: overwrote a property by dot notation with a object');
+
+    assert.deepEqual($.sessionStorage('testNamespace.otherKey.obj', false),
+        {test : 13, otherKey : {obj : false}},
+        'setter: overwrote a deep property by dot notation with a single value');
+
+    assert.deepEqual($.sessionStorage('testNamespace.otherKey.obj', sample),
+        {test : 13, otherKey : {obj : sample}},
+        'setter: overwrote a deep property by dot notation with an object');
+
+	assert.deepEqual($.sessionStorage.remove('testNamespace.otherKey'),
+				 {test : 13},
 				 'remove: removed a sub-object and return the new object');
 
-
 	assert.deepEqual($.sessionStorage('testNamespace'),
-				 {van : 13},
+				 {test : 13},
 				 'getter: gave the updated object after deleting one property');
 
 	assert.deepEqual($.sessionStorage.remove('testNamespace'),
@@ -58,7 +73,7 @@ QUnit.test('$.sessionStorage Test', function(assert){
 				 'remove: returned null after deleting the whole object');
 	
 	assert.deepEqual($.sessionStorage('testNamespace', {a: 125}),
-				 {a: 125},		//TODO this should not be a object, just simply true
+				 {a: 125},
 				 'setter: returned the correct object');
 
 	$.sessionStorage('sample', sample);
@@ -78,11 +93,11 @@ QUnit.test('$.localStorage Test', function(assert){
 	assert.deepEqual($.localStorage('testNamespace'),
 				 null,
 				 'getter: returned null, as this namespace does not exists in $.localStorage, only in $.sessionStorage');
-	
+
 	assert.deepEqual($.localStorage('testNamespace', {object: {level1 : {level2 : {level3 : 'level3'}}}}),
 				 {object: {level1 : {level2 : {level3 : 'level3'}}}},
 				 'setter: returned the new multi-level object');
-	
+
 	assert.deepEqual($.localStorage('testNamespace.object'),
 				 {level1 : {level2 : {level3 : 'level3'}}},
 				 'getter: returned the proper sub-object when called by dot notation');
@@ -90,8 +105,8 @@ QUnit.test('$.localStorage Test', function(assert){
 	assert.deepEqual($.localStorage('testNamespace.object.level1.level2'),
 				 {level3 : 'level3'},
 				 'getter: returned the proper sub-sub-object when called by dot notation');
-	
-	assert.deepEqual($.localStorage.remove('testNamespace'),
+
+    assert.deepEqual($.localStorage.remove('testNamespace'),
 				 null,
 				 'remove: removed the object and returned null');
 	

@@ -33,6 +33,16 @@ The API is the same for both storages.
     
     $.localStorage('testNamespace', myObject);     //setter
 
+    //updateing an existing key somewhere deep inside the object
+    $localStorage(
+        'testNamespace.level1.level2',
+        {
+            foo : {
+                bar : 'Gauranga!'
+            }
+        }
+        );
+
 ### Getter
 
     $.localStorage('testNamespace');      //getter
@@ -58,4 +68,14 @@ The API is the same for both storages.
               }
            }
         });
+
+    $sessionStorage(
+        'testNamespace.level1.level2',
+        {
+            foo : {
+                bar : 'Gauranga!'
+            }
+        }
+        );
+
     $.sessionStorage('testNamespace');    //getter will return our book object

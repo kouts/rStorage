@@ -4,7 +4,7 @@
 * localStorage and sessionStorage helper utility for jQuery
 * If you have idea about improving this plugin please let me know
 *
-* Copyright (c) 2014 rrd
+* Copyright (c) 2014-2016 rrd@1108.cc
 *
 * Licensed under the MIT license:
 * http://opensource.org/licenses/MIT
@@ -12,7 +12,7 @@
 * Project home:
 * https://github.com/rrd108/rStorage
 *
-* Version: 1.0
+* Version: 1.2.0
 *
 */
 JSON.unflatten = function(data) {
@@ -58,16 +58,19 @@ JSON.flatten = function(data) {
 };
 
 (function($){
-
 	function RStorage(target){
 		return {
 			get : function(key){
-				//returns part of the object identified by key (myNamespace.firstLevel.secondLevel) or return null if the key does not exists
+				//returns part of the object identified by key
+                // (myNamespace.firstLevel.secondLevel)
+                // or return null if the key does not exists
 				//TODO use only local not native
 				key = key.split('.');
-				var namespace = key.shift();	//get the first part like nsp from myNamespace.firstLevel.secondLevel				
+                //get the first part like nsp from nsp.firstLevel.secondLevel
+				var namespace = key.shift();
 				try{
-					if (key.length) {		//still there are .-s in the key, walk into deeper
+					if (key.length) {
+                        //still there are dots in the key, walk into deepest
 						var json = JSON.parse(target.getItem(namespace));
 						for(var i = 0; i < key.length ; i++){
 							json = json[key[i]];
@@ -78,19 +81,33 @@ JSON.flatten = function(data) {
 						return JSON.parse(target.getItem(namespace));
 					}
 				} catch(e){
-					return target.getItem(namespace);
+					return JSON.parse(target.getItem(namespace));
 				}
 			},
 
 			_reset : function(key, json){
-				if (key.search(/\./) == -1) {
-					target.setItem(key, JSON.stringify(json));
-					return json;
+                var namespace;
+                if (key.search(/\./) == -1) {
+                    namespace = key;
 				}
 				else{
-					//the key is in dot notation form, reject it
-					throw new Error(key + ' is an invalid key');
+					//the key does contain dots example: textNamespace.nincs.obj
+                    var keys = key.split('.');
+                    namespace = keys.shift();
+                    key = key.replace(namespace + '.', '');
+                    var originalJson = JSON.flatten(JSON.parse(target.getItem(namespace)));
+                    var updatedJson = originalJson;
+                    $.each(originalJson, function (index){
+                        if (index == key) {
+                            updatedJson[key] = json;
+                        }
+                    });
+                    json = JSON.unflatten(updatedJson);
+                    target.setItem(namespace, json);
 				}
+                //objects can be stored only after stringify
+                target.setItem(namespace, JSON.stringify(json));
+                return json;
 			},
 
 			remove : function(key){
@@ -100,6 +117,7 @@ JSON.flatten = function(data) {
 				if (key.length) {		//3: canto2, stories, second
 					var json = JSON.parse(target.getItem(namespace));
 					var part = json[key[0]];
+                    // TODO rewiev this and use flatten
 					//remove json.canto2.title or json['canto2']['title']
 					for(var i = 1; i < (key.length -1) ; i++){	//we stop before the last, as that is we want to delete
 						part = part[key[i]]
@@ -119,12 +137,15 @@ JSON.flatten = function(data) {
 			},
 
 			set : function(key, json){
-				//set part of the object identified by key (myNamespace.firstLevel.secondLevel) overwrites if it is already there, otherwise extends
-				//TODO save to native and local also
-				var originalJson = this.get(key);
-				json = jQuery.extend(originalJson, json);
+				// set part of the object identified by key
+                // (myNamespace.firstLevel.secondLevel)
+                // overwrites if it is already there, otherwise extends it
+                if (typeof(json) == 'object') {
+                    var originalJson = this.get(key);
+                    json = jQuery.extend(originalJson, json);
+                }
 				return this._reset(key, json);
-			}
+			},
 		}
 	}
 
@@ -140,7 +161,7 @@ JSON.flatten = function(data) {
 	$.sessionStorage.remove = function(namespace){
 		return rSessStorage.remove(namespace);
 	};
-	
+
 	var rLocStorage = new RStorage(localStorage);
 	$.localStorage = function(namespace, path){
         if (typeof(path) === 'undefined') {
@@ -153,5 +174,5 @@ JSON.flatten = function(data) {
 	$.localStorage.remove = function(namespace){
 		return rLocStorage.remove(namespace);
 	};
-	
+
 }(jQuery));
