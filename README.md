@@ -5,7 +5,7 @@ jQuery rStorage Plugin
 
 ## localStorage and sessionStorage helper utility for jQuery
 
-rStorage simplify the useage of localStorage and sessionStorage with JSON objects.
+rStorage simplify the usage of localStorage and sessionStorage with JSON objects.
 
 If you have any idea about improving this plugin please let me know
 
@@ -33,15 +33,15 @@ The API is the same for both storages.
     
     $.localStorage('testNamespace', myObject);     //setter
 
-    //updateing an existing key somewhere deep inside the object
-    $localStorage(
+    //updating an existing key somewhere deep inside the object
+    $.localStorage(
         'testNamespace.level1.level2',
         {
             foo : {
                 bar : 'Gauranga!'
             }
-        }
-        );
+        });
+    
 
 ### Getter
 
@@ -69,13 +69,19 @@ The API is the same for both storages.
            }
         });
 
-    $sessionStorage(
+    $.sessionStorage(
         'testNamespace.level1.level2',
         {
             foo : {
                 bar : 'Gauranga!'
             }
-        }
-        );
+        });
+
+    $.sessionStorage(
+        'testNamespace.aNew.deeply.foo',
+        {
+            bar : 'Gauranga!'
+        });
+
 
     $.sessionStorage('testNamespace');    //getter will return our book object
