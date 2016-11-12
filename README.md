@@ -42,6 +42,13 @@ The API is the same for both storages.
             }
         });
     
+    //insert a new key deeply
+    $.localStorage(
+        'testNamespace.aNew.deeply.foo',
+        {
+            bar : 'Gauranga!'
+        });
+    
 
 ### Getter
 

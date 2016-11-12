@@ -57,78 +57,113 @@ JSON.flatten = function(data) {
     return result;
 };
 
-(function($){
-	function RStorage(target){
-		return {
-			get : function(key){
-				//returns part of the object identified by key
+(function($) {
+	function RStorage(target) {
+        return {
+            _getNamespace : function (path) {
+                if (path.search(/\./) == -1) {
+                    return path;
+                }
+                return path.substr(0, path.indexOf('.'));
+            },
+
+            _getKey : function (path) {
+                if (path.search(/\./) == -1) {
+                    return null;
+                }
+                return path.substr(path.indexOf('.') + 1);
+            },
+
+            get : function (path) {
+				//returns part of the object identified by path
                 // (myNamespace.firstLevel.secondLevel)
-                // or return null if the key does not exists
-				//TODO use only local not native
-				key = key.split('.');
+                // or return null if the path does not exists
+                var namespace = this._getNamespace(path);
                 //get the first part like nsp from nsp.firstLevel.secondLevel
-				var namespace = key.shift();
-				try{
-					if (key.length) {
-                        //still there are dots in the key, walk into deepest
-						var json = JSON.parse(target.getItem(namespace));
-						for(var i = 0; i < key.length ; i++){
-							json = json[key[i]];
-						}
-						return json;
-					}
-					else{
-						return JSON.parse(target.getItem(namespace));
-					}
-				} catch(e){
-					return JSON.parse(target.getItem(namespace));
-				}
+                path = this._getKey(path);
+                if (!path) {
+                    return JSON.parse(target.getItem(namespace));
+                } else {
+                    var json = target.getItem(namespace);
+                    if (json) {
+                        json = JSON.flatten(JSON.parse(json));
+                        if (json[path] === undefined) {
+                            //we did not find the value identified by path
+                            // but it can be a found in upper in path
+                            var j = {}, k;
+                            $.each(json, function (key, value) {
+                                if (key.search(path) != -1) {
+                                    //chop off path from key to get the new key for unflatten
+                                    k = key.replace(path + '.', '');
+                                    j[k] = value;
+                                    return false;
+                                }
+                            });
+                            json = k ? j : null;
+                        } else {
+                            json = json[path];
+                        }
+                        return JSON.unflatten(json);
+                    } else {
+                        return null;
+                    }
+                }
 			},
 
-			_reset : function(key, json){
-                var namespace;
-                if (key.search(/\./) == -1) {
-                    namespace = key;
-				}
-				else{
-					//the key does contain dots example: textNamespace.nincs.obj
-                    var keys = key.split('.');
-                    namespace = keys.shift();
-                    key = key.replace(namespace + '.', '');
-                    var originalJson = JSON.flatten(JSON.parse(target.getItem(namespace)));
+			_save : function (path, json) {
+                var namespace = this._getNamespace(path);
+                path = this._getKey(path);
+                var originalJson = target.getItem(namespace);
+                if (originalJson) {
+                    originalJson = JSON.flatten(JSON.parse(originalJson));
                     var updatedJson = originalJson;
-                    $.each(originalJson, function (index){
-                        if (index == key) {
-                            updatedJson[key] = json;
+                    var keyUpdated = false;
+                    $.each(originalJson, function (index) {
+                        if (index == path) {
+                            updatedJson[path] = json;
+                            keyUpdated = true;
                         }
                     });
+                    if (!keyUpdated) {
+                        //this is a new path, lets insert it
+                        if (path) {
+                            updatedJson[path] = json;
+                        } else {
+                            updatedJson = json;
+                        }
+                    }
                     json = JSON.unflatten(updatedJson);
-                    target.setItem(namespace, json);
-				}
-                //objects can be stored only after stringify
-                target.setItem(namespace, JSON.stringify(json));
-                return json;
+                    //objects can be stored only after stringify
+                    target.setItem(namespace, JSON.stringify(json));
+                    return json;
+                } else {
+                    target.setItem(namespace, JSON.stringify(json));
+                    return json;
+                }
 			},
 
-			remove : function(key){
-				//removes part of the object identified by key (myNamespace.firstLevel.secondLevel)
-				key = key.split('.');
-				var namespace = key.shift();
-				if (key.length) {		//3: canto2, stories, second
-					var json = JSON.parse(target.getItem(namespace));
-					var part = json[key[0]];
-                    // TODO rewiev this and use flatten
-					//remove json.canto2.title or json['canto2']['title']
-					for(var i = 1; i < (key.length -1) ; i++){	//we stop before the last, as that is we want to delete
-						part = part[key[i]]
-					}
-					if (key[i]) {
-						delete part[key[i]];
-					}
-					else{		//if there was only one dot we should directly remove from json
-						delete json[key[0]];
-					}
-					this._reset(namespace, json);
+			remove : function (path) {
+				//removes part of the object identified by path (myNamespace.firstLevel.secondLevel)
+				var namespace = this._getNamespace(path);
+                path = this._getKey(path);
+				if (path) {
+					var json = target.getItem(namespace);
+                    if (json) {
+                        json = JSON.flatten(JSON.parse(json));
+                        if (json[path]) {
+                            delete json[path];
+                        } else {
+                            //it can be there at first level of path (even multiple times)
+                            var j = json;
+                            $.each(j, function (key) {
+                                if (key.search(path) != -1) {
+                                    delete json[key];
+                                }
+                            });
+                        }
+                        json = JSON.unflatten(json);
+                    }
+					this._save(namespace, json);
 				}
 				else{
 					target.removeItem(namespace);
@@ -136,15 +171,15 @@ JSON.flatten = function(data) {
 				return this.get(namespace);
 			},
 
-			set : function(key, json){
-				// set part of the object identified by key
+			set : function (path, json) {
+				// set part of the object identified by path
                 // (myNamespace.firstLevel.secondLevel)
                 // overwrites if it is already there, otherwise extends it
                 if (typeof(json) == 'object') {
-                    var originalJson = this.get(key);
+                    var originalJson = this.get(path);
                     json = jQuery.extend(originalJson, json);
                 }
-				return this._reset(key, json);
+				return this._save(path, json);
 			},
 		}
 	}
