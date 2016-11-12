@@ -14,7 +14,7 @@ If you have any idea about improving this plugin please let me know
 * Simple namespacing
 * Store objects and encoding, decoding to or from JSON happens automatically
 * Same function call for getters and setters
-* Setters and getters reognize dot notation format
+* Setters and getters recognize dot notation format
 * Integrated unit tests
 
 ## How to use
