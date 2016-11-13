@@ -88,15 +88,19 @@ JSON.flatten = function(data) {
                     if (json) {
                         json = JSON.flatten(JSON.parse(json));
                         if (json[path] === undefined) {
-                            //we did not find the value identified by path
-                            // but it can be a found in upper in path
+                            /*
+                            we did not find the value identified by path
+                            but it can be a found in upper in path
+                            so path is something like level2.level3
+                             */
                             var j = {}, k;
                             $.each(json, function (key, value) {
-                                if (key.search(path) != -1) {
+                                //if key is level1.level2.level3 and path is as above
+                                if (key.indexOf('.') != -1 && key.search(path) != -1) {
                                     //chop off path from key to get the new key for unflatten
                                     k = key.replace(path + '.', '');
                                     j[k] = value;
-                                    return false;
+                                    return false;   //exit from each
                                 }
                             });
                             json = k ? j : null;
