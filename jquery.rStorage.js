@@ -12,12 +12,12 @@
 * Project home:
 * https://github.com/rrd108/rStorage
 *
-* Version: 1.3.0
+* Version: 1.3.1
 *
 */
 JSON.unflatten = function(data) {
     'use strict';
-    if (Object(data) !== data || Array.isArray(data))
+    if (Object(data) !== data || Array.isArray(data) || Object.getOwnPropertyNames(data).length === 0)
         return data;
     var result = {}, cur, prop, idx, last, temp;
     for(var p in data) {
@@ -133,13 +133,14 @@ JSON.flatten = function(data) {
                         }
                     }
                     json = JSON.unflatten(updatedJson);
-                    //objects can be stored only after stringify
-                    target.setItem(namespace, JSON.stringify(json));
-                    return json;
-                } else {
-                    target.setItem(namespace, JSON.stringify(json));
-                    return json;
+                } else if (path) {
+                    var j = {};
+                    j[path] = json;
+                    json = j;
                 }
+                //objects can be stored only after stringify
+                target.setItem(namespace, JSON.stringify(json));
+                return json;
 			},
 
 			remove : function (path) {

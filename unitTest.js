@@ -128,6 +128,21 @@ QUnit.test('$.sessionStorage Test', function(assert){
     assert.deepEqual($.sessionStorage.remove('sample.widget.text'),
         {widget : {debug : 'on'}},
         'remove: removed a sub-object and return the new object');
+
+    assert.deepEqual($.sessionStorage('gaura.cache', {}),
+        {cache : {}},
+        'setter: add an empty object');
+
+    assert.deepEqual($.sessionStorage('gaura.cacheTest', false),
+        {
+            cache : {},
+            cacheTest : false
+        },
+        'setter: add new key with similar start of an existing one');
+
+    assert.deepEqual($.sessionStorage('gaura.cache'),
+        {},
+        'getter: get key with similar start of another one');
 });
 
 QUnit.test('$.localStorage Test', function(assert){
