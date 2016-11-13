@@ -60,6 +60,20 @@ JSON.flatten = function(data) {
 (function($) {
 	function RStorage(target) {
         return {
+            _merge: function (obj1, obj2) {
+                //get everything from obj2 to obj1
+                if (typeof(obj1) != 'object') {
+                    return obj2;
+                }
+                //TODO we should get rid of jQuery extensions on obj2
+                //as for example on an ajax call we will get back
+                //a jQuery object
+                for (var aKey in obj2) {
+                    obj1[aKey] = obj2[aKey];
+                }
+                return obj1;
+            },
+
             _getNamespace : function (path) {
                 if (path.search(/\./) == -1) {
                     return path;
@@ -77,7 +91,7 @@ JSON.flatten = function(data) {
             get : function (path) {
 				//returns part of the object identified by path
                 // (myNamespace.firstLevel.secondLevel)
-                // or return null if the path does not exists
+                // or return null if the path value does not exists
                 var namespace = this._getNamespace(path);
                 //get the first part like nsp from nsp.firstLevel.secondLevel
                 path = this._getKey(path);
@@ -100,7 +114,6 @@ JSON.flatten = function(data) {
                                     //chop off path from key to get the new key for unflatten
                                     k = key.replace(path + '.', '');
                                     j[k] = value;
-                                    return false;   //exit from each
                                 }
                             });
                             json = k ? j : null;
@@ -114,7 +127,7 @@ JSON.flatten = function(data) {
                 }
 			},
 
-			_save : function (path, json) {
+            _save : function (path, json) {
                 var namespace = this._getNamespace(path);
                 path = this._getKey(path);
                 var originalJson = target.getItem(namespace);
@@ -131,7 +144,10 @@ JSON.flatten = function(data) {
                     if (!keyUpdated) {
                         //this is a new path, lets insert it
                         if (path) {
-                            updatedJson[path] = json;
+                            var j = {};
+                            j[path] = json;
+                            j = JSON.flatten(j);
+                            updatedJson = this._merge(updatedJson, j);
                         } else {
                             updatedJson = json;
                         }
@@ -182,7 +198,9 @@ JSON.flatten = function(data) {
                 // overwrites if it is already there, otherwise extends it
                 if (typeof(json) == 'object') {
                     var originalJson = this.get(path);
-                    json = jQuery.extend(originalJson, json);
+                    if (originalJson) {
+                        json = this._merge(originalJson, json);
+                    }
                 }
 				return this._save(path, json);
 			},

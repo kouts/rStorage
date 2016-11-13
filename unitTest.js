@@ -142,8 +142,72 @@ QUnit.test('$.sessionStorage Test', function(assert) {
             cache: {}
         },
         'setter: add new key with similar start of an existing one');
-    }
-);
+
+    assert.deepEqual(
+        $.sessionStorage(
+            'gaura.cache',
+            {
+                arr: [
+                    {a: 'a'},
+                    {b: 'b'}
+                ]
+            }
+        ),
+        {
+            cacheTest: true,
+            cache: {
+                arr: [
+                    {a: 'a'},
+                    {b: 'b'}
+                ]
+            }
+        },
+        'setter: handling arrays is the same');
+
+    $.sessionStorage('laksmi.cache', {});
+    $.sessionStorage('laksmi.cache.foo', [1,2]);
+    $.sessionStorage('laksmi.cache.bar', [3,4,5]);
+    assert.deepEqual($.sessionStorage('laksmi'),
+        {cache:{
+            'foo' : [1,2],
+            'bar' : [3,4,5]
+        }},
+        'getter: after set arrays for multiple properties');
+
+    assert.deepEqual($.sessionStorage('laksmi.cache', $([{l: 'l1', v: 'v1'},{l: 'l2', v: 'v2'}])),
+        {cache:{
+            'foo' : [1,2],
+            'bar' : [3,4,5]
+        }},
+        'setter: mergeing a jQuery array');
+
+
+    $.sessionStorage('turo.rudi', {});
+    $.sessionStorage('turo.rudi.foo', [{a : 'a1', b : 'b1'}]);
+    $.sessionStorage('turo.rudi.foobar', [{x : 'a2', y : 'b2'}]);
+    assert.deepEqual($.sessionStorage('turo'),
+        {rudi:{
+            'foo' : [{a : 'a1', b : 'b1'}],
+            'foobar' : [{x : 'a2', y : 'b2'}]
+        }},
+        'getter: get full object after set object arrays with similar names for multiple properties');
+    assert.deepEqual($.sessionStorage('turo.rudi'),
+        {
+            'foo' : [{a : 'a1', b : 'b1'}],
+            'foobar' : [{x : 'a2', y : 'b2'}]
+        },
+        'getter: get 2nd level after set object arrays with similar names for multiple properties');
+    assert.deepEqual($.sessionStorage('turo.rudi.foo'),
+         [{a : 'a1', b : 'b1'}],
+        'getter: get 3rd level after set object arrays with similar names for multiple properties');
+    assert.deepEqual($.sessionStorage('turo.rudi.foo.0'),
+        {a : 'a1', b : 'b1'},
+        'getter: get 4th level after set object arrays with similar names for multiple properties');
+    assert.deepEqual($.sessionStorage('turo.rudi.foo.0.b'),
+        'b1',
+        'getter: get 5th level after set object arrays with similar names for multiple properties');
+
+});
 
 QUnit.test('$.localStorage Test', function(assert){
     assert.deepEqual($.localStorage('testNamespace'),
