@@ -23,72 +23,79 @@ The API is the same for both storages.
 
 ### Setter
 
-    var myObject = {
-      level1 : {
-         level2 : {
-            level3 : 'level3'
-         }
-      }
-    }
-    
-    $.localStorage('testNamespace', myObject);     //setter
+```js
+var myObject = {
+  level1 : {
+     level2 : {
+        level3 : 'level3'
+     }
+  }
+}
 
-    //updating an existing key somewhere deep inside the object
-    $.localStorage(
-        'testNamespace.level1.level2',
-        {
-            foo : {
-                bar : 'Gauranga!'
-            }
-        });
-    
-    //insert a new key deeply
-    $.localStorage(
-        'testNamespace.aNew.deeply.foo',
-        {
+$.localStorage('testNamespace', myObject);     //setter
+
+//updating an existing key somewhere deep inside the object
+$.localStorage(
+    'testNamespace.level1.level2',
+    {
+        foo : {
             bar : 'Gauranga!'
-        });
-    
+        }
+    });
+
+//insert a new key deeply
+$.localStorage(
+    'testNamespace.aNew.deeply.foo',
+    {
+        bar : 'Gauranga!'
+    });
+```
 
 ### Getter
 
-    $.localStorage('testNamespace');      //getter
-    $.localStorage('testNamespace.level1');      //dot notation getter
+```js
+$.localStorage('testNamespace');      //getter
+$.localStorage('testNamespace.level1');      //dot notation getter
+```
 
 ### Removing parts by dot notation
 
-    $.localStorage.remove('testNamespace.level1.level2');
+```js
+$.localStorage.remove('testNamespace.level1.level2');
+```
 
 ### Same examples for sessionStorage
 
-    $.sessionStorage('testNamespace');     //getter, it does not see what we have in $.localStorage
-    $.sessionStorage('testNamespace',
-        {
-           book : {
-              chapter1: {
-                 title : 'First Chapter',
-                 pages : 200
-              }
-              chapter2: {
-                 title : 'Second Chapter',
-                 pages : 300
-              }
-           }
-        });
+```js
+$.sessionStorage('testNamespace');     //getter, it does not see what we have in $.localStorage
+$.sessionStorage('testNamespace',
+    {
+       book : {
+          chapter1: {
+             title : 'First Chapter',
+             pages : 200
+          }
+          chapter2: {
+             title : 'Second Chapter',
+             pages : 300
+          }
+       }
+    });
 
-    $.sessionStorage(
-        'testNamespace.level1.level2',
-        {
-            foo : {
-                bar : 'Gauranga!'
-            }
-        });
-
-    $.sessionStorage(
-        'testNamespace.aNew.deeply.foo',
-        {
+$.sessionStorage(
+    'testNamespace.level1.level2',
+    {
+        foo : {
             bar : 'Gauranga!'
-        });
+        }
+    });
+
+$.sessionStorage(
+    'testNamespace.aNew.deeply.foo',
+    {
+        bar : 'Gauranga!'
+    });
 
 
-    $.sessionStorage('testNamespace');    //getter will return our book object
+$.sessionStorage('testNamespace');    //getter will return our book object
+```
