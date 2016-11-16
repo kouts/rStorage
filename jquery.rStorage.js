@@ -65,12 +65,9 @@ JSON.flatten = function(data) {
                 if (typeof(obj1) != 'object') {
                     return obj2;
                 }
-                //TODO we should get rid of jQuery extensions on obj2
-                //as for example on an ajax call we will get back
-                //a jQuery object
-                for (var aKey in obj2) {
-                    obj1[aKey] = obj2[aKey];
-                }
+                $.each(obj2, function (k){
+                    obj1[k] = obj2[k];
+                });
                 return obj1;
             },
 

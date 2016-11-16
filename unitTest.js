@@ -175,10 +175,14 @@ QUnit.test('$.sessionStorage Test', function(assert) {
         'getter: after set arrays for multiple properties');
 
     assert.deepEqual($.sessionStorage('laksmi.cache', $([{l: 'l1', v: 'v1'},{l: 'l2', v: 'v2'}])),
-        {cache:{
-            'foo' : [1,2],
-            'bar' : [3,4,5]
-        }},
+        {
+            cache : {
+                0 : {l: 'l1', v: 'v1'},
+                1 : {l: 'l2', v: 'v2'},
+                'bar' : [3,4,5],
+                'foo' : [1,2]
+            }
+        },
         'setter: mergeing a jQuery array');
 
 
