@@ -12,7 +12,7 @@
 * Project home:
 * https://github.com/rrd108/rStorage
 *
-* Version: 1.3.1
+* Version: 1.3.2
 *
 */
 JSON.unflatten = function(data) {
