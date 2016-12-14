@@ -10,54 +10,56 @@
 * http://opensource.org/licenses/MIT
 *
 * Project home:
-* https://github.com/rrd108/rStorage
+* https://github.com/kouts/rStorage
 *
 * Version: 1.3.2
 *
 */
-JSON.unflatten = function(data) {
-    'use strict';
-    if (Object(data) !== data || Array.isArray(data) || Object.getOwnPropertyNames(data).length === 0)
-        return data;
-    var result = {}, cur, prop, idx, last, temp;
-    for(var p in data) {
-        cur = result, prop = '', last = 0;
-        do {
-            idx = p.indexOf('.', last);
-            temp = p.substring(last, idx !== -1 ? idx : undefined);
-            cur = cur[prop] || (cur[prop] = (!isNaN(parseInt(temp)) ? [] : {}));
-            prop = temp;
-            last = idx + 1;
-        } while(idx >= 0);
-        cur[prop] = data[p];
-    }
-    return result[''];
-};
-JSON.flatten = function(data) {
-    var result = {};
-    function recurse (cur, prop) {
-        if (Object(cur) !== cur) {
-            result[prop] = cur;
-        } else if (Array.isArray(cur)) {
-            for(var i=0, l=cur.length; i<l; i++)
-                recurse(cur[i], prop ? prop+'.'+i : ''+i);
-            if (l == 0)
-                result[prop] = [];
-        } else {
-            var isEmpty = true;
-            for (var p in cur) {
-                isEmpty = false;
-                recurse(cur[p], prop ? prop+'.'+p : p);
-            }
-            if (isEmpty)
-                result[prop] = {};
-        }
-    }
-    recurse(data, '');
-    return result;
-};
-
 (function($) {
+
+    function unflatten(data) {
+        'use strict';
+        if (Object(data) !== data || Array.isArray(data) || Object.getOwnPropertyNames(data).length === 0)
+            return data;
+        var result = {}, cur, prop, idx, last, temp;
+        for(var p in data) {
+            cur = result, prop = '', last = 0;
+            do {
+                idx = p.indexOf('.', last);
+                temp = p.substring(last, idx !== -1 ? idx : undefined);
+                cur = cur[prop] || (cur[prop] = (!isNaN(parseInt(temp)) ? [] : {}));
+                prop = temp;
+                last = idx + 1;
+            } while(idx >= 0);
+            cur[prop] = data[p];
+        }
+        return result[''];
+    };
+
+    function flatten(data) {
+        var result = {};
+        function recurse (cur, prop) {
+            if (Object(cur) !== cur) {
+                result[prop] = cur;
+            } else if (Array.isArray(cur)) {
+                for(var i=0, l=cur.length; i<l; i++)
+                    recurse(cur[i], prop ? prop+'.'+i : ''+i);
+                if (l == 0)
+                    result[prop] = [];
+            } else {
+                var isEmpty = true;
+                for (var p in cur) {
+                    isEmpty = false;
+                    recurse(cur[p], prop ? prop+'.'+p : p);
+                }
+                if (isEmpty)
+                    result[prop] = {};
+            }
+        }
+        recurse(data, '');
+        return result;
+    };
+
 	function RStorage(target) {
         return {
             _merge: function (obj1, obj2) {
@@ -97,7 +99,7 @@ JSON.flatten = function(data) {
                 } else {
                     var json = target.getItem(namespace);
                     if (json) {
-                        json = JSON.flatten(JSON.parse(json));
+                        json = flatten(JSON.parse(json));
                         if (json[path] === undefined) {
                             /*
                             we did not find the value identified by path
@@ -117,7 +119,7 @@ JSON.flatten = function(data) {
                         } else {
                             json = json[path];
                         }
-                        return JSON.unflatten(json);
+                        return unflatten(json);
                     } else {
                         return null;
                     }
@@ -129,7 +131,7 @@ JSON.flatten = function(data) {
                 path = this._getKey(path);
                 var originalJson = target.getItem(namespace);
                 if (originalJson) {
-                    originalJson = JSON.flatten(JSON.parse(originalJson));
+                    originalJson = flatten(JSON.parse(originalJson));
                     var updatedJson = originalJson;
                     var keyUpdated = false;
                     $.each(originalJson, function (index) {
@@ -143,13 +145,13 @@ JSON.flatten = function(data) {
                         if (path) {
                             var j = {};
                             j[path] = json;
-                            j = JSON.flatten(j);
+                            j = flatten(j);
                             updatedJson = this._merge(updatedJson, j);
                         } else {
                             updatedJson = json;
                         }
                     }
-                    json = JSON.unflatten(updatedJson);
+                    json = unflatten(updatedJson);
                 } else if (path) {
                     var j = {};
                     j[path] = json;
@@ -167,7 +169,7 @@ JSON.flatten = function(data) {
 				if (path) {
 					var json = target.getItem(namespace);
                     if (json) {
-                        json = JSON.flatten(JSON.parse(json));
+                        json = flatten(JSON.parse(json));
                         if (json[path]) {
                             delete json[path];
                         } else {
@@ -179,7 +181,7 @@ JSON.flatten = function(data) {
                                 }
                             });
                         }
-                        json = JSON.unflatten(json);
+                        json = unflatten(json);
                     }
 					this._save(namespace, json);
 				}
@@ -204,30 +206,7 @@ JSON.flatten = function(data) {
 		}
 	}
 
-	var rSessStorage = new RStorage(sessionStorage);
-	$.sessionStorage = function(namespace, path){
-		if (typeof(path) === 'undefined') {
-			return rSessStorage.get(namespace);
-		}
-		else{
-			return rSessStorage.set(namespace, path);
-		}
-	};
-	$.sessionStorage.remove = function(namespace){
-		return rSessStorage.remove(namespace);
-	};
-
-	var rLocStorage = new RStorage(localStorage);
-	$.localStorage = function(namespace, path){
-        if (typeof(path) === 'undefined') {
-			return rLocStorage.get(namespace);
-		}
-		else{
-			return rLocStorage.set(namespace, path);
-		}
-	};
-	$.localStorage.remove = function(namespace){
-		return rLocStorage.remove(namespace);
-	};
+	$.sessionStorage = new RStorage(sessionStorage);
+	$.localStorage = new RStorage(localStorage);
 
 }(jQuery));
