@@ -1,7 +1,10 @@
 rStorage
 ========
 
-jQuery rStorage Plugin
+This a fork of the jQuery rStorage Plugin
+The differences are:
+* Different method for gettter and setter
+* Put flatten and unflatten methods in local scope
 
 ## localStorage and sessionStorage helper utility for jQuery
 
@@ -13,7 +16,7 @@ If you have any idea about improving this plugin please let me know
 
 * Simple namespacing
 * Store objects and encoding, decoding to or from JSON happens automatically
-* Same function call for getters and setters
+* Different function call for getters and setters
 * Setters and getters recognize dot notation format
 * Integrated unit tests
 
@@ -32,10 +35,10 @@ var myObject = {
   }
 }
 
-$.localStorage('testNamespace', myObject);     //setter
+$.localStorage.set('testNamespace', myObject);     //setter
 
 //updating an existing key somewhere deep inside the object
-$.localStorage(
+$.localStorage.set(
     'testNamespace.level1.level2',
     {
         foo : {
@@ -44,7 +47,7 @@ $.localStorage(
     });
 
 //insert a new key deeply
-$.localStorage(
+$.localStorage.set(
     'testNamespace.aNew.deeply.foo',
     {
         bar : 'Gauranga!'
@@ -54,8 +57,8 @@ $.localStorage(
 ### Getter
 
 ```js
-$.localStorage('testNamespace');      //getter
-$.localStorage('testNamespace.level1');      //dot notation getter
+$.localStorage.get('testNamespace');      //getter
+$.localStorage.get('testNamespace.level1');      //dot notation getter
 ```
 
 ### Removing parts by dot notation
@@ -67,8 +70,8 @@ $.localStorage.remove('testNamespace.level1.level2');
 ### Same examples for sessionStorage
 
 ```js
-$.sessionStorage('testNamespace');     //getter, it does not see what we have in $.localStorage
-$.sessionStorage('testNamespace',
+$.sessionStorage.get('testNamespace');     //getter, it does not see what we have in $.localStorage
+$.sessionStorage.set('testNamespace',
     {
        book : {
           chapter1: {
@@ -82,7 +85,7 @@ $.sessionStorage('testNamespace',
        }
     });
 
-$.sessionStorage(
+$.sessionStorage.set(
     'testNamespace.level1.level2',
     {
         foo : {
@@ -90,12 +93,12 @@ $.sessionStorage(
         }
     });
 
-$.sessionStorage(
+$.sessionStorage.set(
     'testNamespace.aNew.deeply.foo',
     {
         bar : 'Gauranga!'
     });
 
 
-$.sessionStorage('testNamespace');    //getter will return our book object
+$.sessionStorage.get('testNamespace');    //getter will return our book object
 ```
